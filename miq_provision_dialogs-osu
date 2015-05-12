@@ -1,0 +1,196 @@
+---
+:buttons:
+- :submit
+- :cancel
+:dialogs:
+  :service:
+    :description: VM Details
+    :fields:
+      :number_of_vms:
+        :values_from:
+          :options:
+            :max: 5
+          :method: :allowed_number_of_vms
+        :description: Count
+        :required: false
+        :display: :hide
+        :default: 1
+        :data_type: :integer
+      :vm_description:
+        :description: VM Description
+        :required: false
+        :display: :edit
+        :data_type: :string
+        :min_length: 
+        :max_length: 100
+      :vm_prefix:
+        :description: VM Name Prefix/Suffix
+        :required_method: :validate_vm_name
+        :required: false
+        :display: :hide
+        :data_type: :string
+      :src_vm_id:
+        :values_from:
+          :options:
+            :tag_filters: []
+          :method: :allowed_templates
+        :description: Source Template
+        :required: true
+        :notes: 
+        :display: :show
+        :data_type: :integer
+        :notes_display: :show
+      :vm_name:
+        :description: VM Name
+        :required_method: :validate_vm_name
+        :required: true
+        :notes: 
+        :display: :edit
+        :data_type: :string
+        :notes_display: :show
+        :min_length: 
+        :max_length: 
+      :host_name:
+        :description: Host Name
+        :required: false
+        :display: :hide
+        :data_type: :string
+      :provision_type:
+        :values_from:
+          :method: :allowed_provision_types
+        :description: Provision Type
+        :required: true
+        :display: :hide
+        :default: vmware
+        :data_type: :string
+      :snapshot:
+        :values_from:
+          :method: :allowed_snapshots
+        :description: Snapshot
+        :required: false
+        :display: :hide
+        :data_type: :string
+        :auto_select_single: false
+      :vm_filter:
+        :values_from:
+          :options:
+            :category: :Vm
+          :method: :allowed_filters
+        :description: Filter
+        :required: false
+        :display: :hide
+        :data_type: :integer
+    :display: :show
+  :schedule:
+    :description: Schedule
+    :fields:
+      :schedule_type:
+        :values:
+          schedule: Schedule
+          immediately: Immediately on Approval
+        :description: When to Provision
+        :required: false
+        :display: :edit
+        :default: immediately
+        :data_type: :string
+      :vm_auto_start:
+        :values:
+          false: 0
+          true: 1
+        :description: Power on virtual machines after creation
+        :required: false
+        :display: :edit
+        :default: false
+        :data_type: :boolean
+      :schedule_time:
+        :values_from:
+          :options:
+            :offset: 1.day
+          :method: :default_schedule_time
+        :description: Provision on
+        :required: false
+        :display: :edit
+        :data_type: :time
+      :retirement:
+        :values:
+          0: Indefinite
+          1.month: 1 Month
+          3.months: 3 Months
+          6.months: 6 Months
+        :description: Time until Retirement
+        :required: false
+        :display: :edit
+        :default: 0
+        :data_type: :integer
+      :retirement_warn:
+        :values_from:
+          :options:
+            :values:
+              1.week: 1 Week
+              2.weeks: 2 Weeks
+              30.days: 30 Days
+            :include_equals: false
+            :field: :retirement
+          :method: :values_less_then
+        :description: Retirement Warning
+        :required: true
+        :display: :edit
+        :default: 1.week
+        :data_type: :integer
+    :display: :show
+  :environment:
+    :description: Environment
+    :fields:
+      :placement_auto:
+        :values:
+          false: 0
+          true: 1
+        :description: Choose Automatically
+        :required: false
+        :display: :show
+        :default: true
+        :data_type: :boolean
+    :display: :show
+  :network:
+    :description: Network
+    :fields:
+      :vlan:
+        :values:
+          Vlan 471: Vlan 471
+          Vlan 479: Vlan 479
+        :description: VLAN
+        :required: false
+        :display: :edit
+        :default: ""
+        :data_type: :string
+      :mac_address:
+        :description: MAC Address
+        :required: false
+        :display: :hide
+        :data_type: :string
+    :display: :show
+  :hardware:
+    :description: Size
+    :fields:
+      :number_of_cpus:
+        :values:
+          s: '1. Small (1 CPU, 1Gb RAM)'
+          m: '2. Medium (2 CPU, 4Gb RAM)'
+          l: '3. Large (4 CPU, 8Gb RAM)'
+          xl: '4. Extra-Large (8 CPU, 8Gb RAM)'
+        :description: Hardware size of VM
+        :required: true
+        :display: :edit
+        :default: s
+        :data_type: :string
+    :display: :show
+:dialog_order:
+- :requester
+- :purpose
+- :service
+- :environment
+- :vdi
+- :hardware
+- :network
+- :customize
+- :schedule
