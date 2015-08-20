@@ -68,7 +68,7 @@ begin
 
     # Build subject
     vm_name = miq_request.options[:vm_name]
-    subject = "Request for new VM approved: #{vm_name}"
+    subject = "[MIQ] - your request for new VM #{vm_name} has been approved"
 
     # Build email body
     body = "Hello, "
@@ -90,7 +90,6 @@ begin
 
   # Override the default appliance IP Address below
   appliance = nil
-  # appliance ||= 'evmserver.company.com'
   appliance ||= $evm.object['miq_server_hostname']
 
   # Email Requester

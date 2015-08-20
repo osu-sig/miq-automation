@@ -23,6 +23,12 @@ def log(level, message)
   $evm.log(level, "#{@method} - #{message}") if @debug
 end
 
+def dump_root
+  log(:info, "Root:<$evm.root> Attributes - Begin")
+  $evm.root.attributes.sort.each { |k, v| $evm.log("info", "  Attribute - #{k}: #{v}") }
+  log(:info, "Root:<$evm.root> Attributes - End")
+end
+
 begin
   log(:info, "EVM Automate Method Started")
 
@@ -61,17 +67,17 @@ begin
     signature = nil
     signature ||= $evm.object['signature']
 
+    vm_name = miq_request.options[:vm_name]
+
     # Set email subject
-    subject = "Request ID #{miq_request.id} - Your Request for a new VM(s) was not Auto-Approved"
+    subject = "[MIQ] - your request for new VM #{vm_name} has been submitted for approval"
 
     # Build email body
-    body = "Hello, "
-    body += "<br>#{msg}."
-    body += "<br><br>Please review your Request and update or wait for approval from an Administrator."
-    body += "<br><br>To view this Request go to: "
-    body += "<a href='https://#{appliance}/miq_request/show/#{miq_request.id}'>https://#{appliance}/miq_request/show/#{miq_request.id}</a>"
-    body += "<br><br> Thank you,"
-    body += "<br> #{signature}"
+    body = "Hello,"
+    body += "<br><br>Your request for the new virtual machine <strong>#{vm_name}</strong> has been submitted for approval. You will be notified via email when the request has been approved."
+    body += "<br><br>To view this request, go to: <a href='https://#{appliance}/miq_request/show/#{miq_request.id}'>https://#{appliance}/miq_request/show/#{miq_request.id}</a>"
+    body += "<br><br>Thank you,"
+    body += "<br>#{signature}"
 
     # Send email to requester
     log(:info, "Sending email to <#{to}> from <#{from}> subject: <#{subject}>")
@@ -110,26 +116,27 @@ begin
     signature = nil
     signature ||= $evm.object['signature']
 
+    vm_name = miq_request.options[:vm_name]
+    vm_description = miq_request.options[:vm_description]
+
     # Set email subject
     if provisionRequestApproval
-      subject = "#{@method} - Request ID #{miq_request.id} - Virtual machine request was not approved"
+      subject = "[MIQ] - request for new VM #{vm_name} pending"
     else
-      subject = "#{@method} - Request ID #{miq_request.id} - Virtual Machine request was denied due to quota limitations"
+      subject = "[MIQ] - request for new VM #{vm_name} pending due to quota limitations"
     end
 
     # Build email body
-    body = "Approver, "
-    body += "<br>A request received from #{requester_email} is pending."
-    body += "<br><br>#{msg}."
-    body += "<br><br>Approvers notes: #{miq_request.reason}" if provisionRequestApproval
-    body += "<br><br>For more information you can go to: <a href='https://#{appliance}/miq_request/show/#{miq_request.id}'>https://#{appliance}/miq_request/show/#{miq_request.id}</a>"
-    body += "<br><br> Thank you,"
-    body += "<br> #{signature}"
+    body = "#{requester_email} has submitted a request for a new VM: <strong>#{vm_name}</strong>"
+    body += "</br></br>Description: #{vm_description}"
+    body += "</br></br>To view this request, go to: <a href='https://#{appliance}/miq_request/show/#{miq_request.id}'>https://#{appliance}/miq_request/show/#{miq_request.id}</a>"
 
     # Send email to approver
     log(:info, "#{@method} - Sending email to <#{to}> from <#{from}> subject: <#{subject}>")
     $evm.execute(:send_email, to, from, subject, body)
   end
+
+  #dump_root
 
   # Get miq_request from root
   miq_request = $evm.root['miq_request']
@@ -138,8 +145,7 @@ begin
 
   # Override the default appliance IP Address below
   appliance = nil
-  # appliance ||= 'evmserver.company.com'
-  appliance ||= $evm.root['miq_server'].ipaddress
+  appliance ||= $evm.object['miq_server_hostname']
 
   # Get incoming message or set it to default if nil
   msg = miq_request.resource.message || "Request pending"

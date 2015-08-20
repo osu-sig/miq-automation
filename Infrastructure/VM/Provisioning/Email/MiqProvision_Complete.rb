@@ -67,10 +67,10 @@ begin
   signature ||= $evm.object['signature']
 
   # Set email Subject
-  subject = "Request for new VM complete: #{vm['name']}"
+  subject = "[MIQ] - new VM #{vm['name']} has been created"
 
   # Set the opening body to Hello
-  body = "Hello, "
+  body = "Hello,"
 
   # VM Provisioned Email Body
   body += "<br><br>Your request to provision the new virtual machine <strong>#{vm['name']}</strong> was completed on #{Time.now.strftime('%A, %B %d, %Y at %I:%M%p')}. "
